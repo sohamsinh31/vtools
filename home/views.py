@@ -24,6 +24,7 @@ def upload(request):
         print(type(uploaded_file))
         print(type(uploaded_file.read()))
         print(type(str(uploaded_file.read())))
+        print("hi")
         pathh = "media/"+uploaded_file.name
         fs.save("output.pdf",convert(pathh,"output.pdf"))
         # doc = aw.Document(uploaded_file)
