@@ -5,8 +5,8 @@ from django.shortcuts import render
 from docx2pdf import convert
 from django.http import FileResponse
 from djangoconvertvdoctopdf.convertor import StreamingConvertedPdf
-import PyPDF2
 import os
+from pytube import YouTube 
 from django.core.files.storage import FileSystemStorage
 
 # Create your views here.
@@ -22,15 +22,9 @@ def upload(request):
         uploaded_file=request.FILES['document']
         name=uploaded_file.name
         split_tup = os.path.splitext(name)
-        print(split_tup)
-        file_name = split_tup[0]
         finalname = split_tup[0]+".pdf"
-        file_extension = split_tup[1]
         fs = FileSystemStorage()
         fs.save(name,uploaded_file)
-        print(type(uploaded_file))
-        print(type(uploaded_file.read()))
-        print(type(str(uploaded_file.read())))
         pathh = "media/"+uploaded_file.name
         pathh2="media/"+finalname
         convert(pathh,pathh2)
@@ -40,3 +34,13 @@ def upload(request):
             print("kuchh or try karo bhai")
         return FileResponse(open(pathh2, 'rb'), content_type='application/pdf')
     return render(request,'index.html')
+
+def download(request):
+  if request.method == 'GET':
+    inp_value = request.GET.get('download', 'This is a default value')
+    print(inp_value)
+    url = YouTube(inp_value)
+    video = url.streams.get_highest_resolution()
+    video.download()
+    context = {'inp_value': inp_value}
+    return render(request,'download.html',context)
