@@ -8,10 +8,12 @@
 </head>
 <body>
     <p>Youtube video downloader</p>
-<form enctype="multipart/form-data" method="get">
+<form id="location_form" enctype="multipart/form-data" method="post">
     {% csrf_token %}
-    <input type="text" name="download">
+    <input type="text" name="download" required>
     <button type="submit">Download</button>
 </form>
 </body>
+<script>
+</script>
 </html>
