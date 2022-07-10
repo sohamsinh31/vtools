@@ -1,16 +1,11 @@
 from http.client import HTTPResponse
-from typing import final
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from docx2pdf import convert
 from django.http import FileResponse
-from djangoconvertvdoctopdf.convertor import StreamingConvertedPdf
 import os
-from pytube import YouTube 
-from pathlib import Path
-import mimetypes
+from pytube import YouTube,streams,helpers
 from django.core.files.storage import FileSystemStorage
-from django import forms
 
 # Create your views here.
 def index(request):
@@ -45,9 +40,11 @@ def download(request):
         url = YouTube(inp_value)
         video = url.streams.get_highest_resolution()
         filename = video.default_filename
-        ffpath = video.get_file_path
-        response = HttpResponse(video, content_type='application/mp4')
+        ffpath = video.get_file_path(output_path=None)
+        video.download()
+        with open(filename,"rb") as fh:
+            data = fh.read()
+        response = HttpResponse(data, content_type='video/mp4')
         response['Content-Disposition'] = "attachment; filename=%s" % filename
         return response
-        context = {'inp_value': inp_value}
-    return render(request,'download.html')
+    return render(request,'download.html',context = {'filename': filename})
