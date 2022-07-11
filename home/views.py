@@ -49,10 +49,13 @@ def download(request):
         path=settings.MEDIA2
         print(settings.MEDIA2)
         video.download(output_path=settings.MEDIA2)
+        data = io.BytesIO()
         with open(path+"/"+filename,"rb") as fh:
-            data = fh.read()
+            data.write(fh.read())
+        data.seek(0)
         response = HttpResponse(data,content_type='application/mp4')
         response['Content-Disposition'] = "attachment; filename=%s" % filename
+        os.remove(path+"/"+filename)
         return response
     return render(request,'download.html')
 
