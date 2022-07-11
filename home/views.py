@@ -11,6 +11,7 @@ from django.conf import settings
 import instaloader
 import shutil
 import glob
+import io
 
 # Create your views here.
 def index(request):
@@ -71,9 +72,12 @@ def instagram(request):
         parent = os.getcwd()
         path = os.path.join(parent, directory)
         shutil.rmtree(path, ignore_errors=False)
+        data = io.BytesIO()
         with open(files[0],"rb") as fh:
-            data = fh.read()
+            data.write(fh.read())
+        data.seek(0)
         response = HttpResponse(data,content_type="application/jpg")
         response['Content-Disposition'] = "attachment; filename=%s" % filee
+        os.remove(files[0])
         return response
     return render(request,'instadown.html')
