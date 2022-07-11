@@ -1,4 +1,5 @@
 from http.client import HTTPResponse
+import profile
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from docx2pdf import convert
@@ -6,6 +7,10 @@ from django.http import FileResponse
 import os
 from pytube import YouTube,streams,helpers
 from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+import instaloader
+import shutil
+import glob
 
 # Create your views here.
 def index(request):
@@ -40,11 +45,35 @@ def download(request):
         url = YouTube(inp_value)
         video = url.streams.get_highest_resolution()
         filename = video.default_filename
-        ffpath = video.get_file_path(output_path=None)
-        video.download()
-        with open(filename,"rb") as fh:
+        path=settings.MEDIA2
+        print(settings.MEDIA2)
+        video.download(output_path=settings.MEDIA2)
+        with open(path+"/"+filename,"rb") as fh:
             data = fh.read()
-        response = HttpResponse(data, content_type='video/mp4')
+        response = HttpResponse(data,content_type='application/mp4')
         response['Content-Disposition'] = "attachment; filename=%s" % filename
         return response
-    return render(request,'download.html',context = {'filename': filename})
+    return render(request,'download.html')
+
+def instagram(request):
+    if request.method == 'POST':
+        inp_value = request.POST['download']
+        ig = instaloader.Instaloader()
+        dp = inp_value
+        filee=dp+".jpg"
+        path ="instagram"
+        ig.download_profile(dp ,path, profile_pic_only=True)
+        files_path = os.path.join(path, '*')
+        files = sorted(
+           glob.iglob(files_path), key=os.path.getctime, reverse=True) 
+        print(files[0])
+        directory = dp
+        parent = os.getcwd()
+        path = os.path.join(parent, directory)
+        shutil.rmtree(path, ignore_errors=False)
+        with open(files[0],"rb") as fh:
+            data = fh.read()
+        response = HttpResponse(data,content_type="application/jpg")
+        response['Content-Disposition'] = "attachment; filename=%s" % filee
+        return response
+    return render(request,'instadown.html')

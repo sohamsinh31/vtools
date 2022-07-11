@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-bupva05n4$-huvl-&ku1#ess+%eosn5j$vd&#iyu&vh&x8=26h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.0.101']
+ALLOWED_HOSTS = ['127.0.0.1','192.168.0.101']
 
 
 # Application definition
@@ -56,6 +56,8 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'vtools.urls'
 MEDIA_ROOT= os.path.join(BASE_DIR, "media")
 MEDIA_URL="/media/"
+MEDIAURL="/youtube/"
+MEDIA2=os.path.join(BASE_DIR,"youtube")
 TEMPLATES_PATH =BASE_DIR / "templates"
 TEMPLATES = [
     {
