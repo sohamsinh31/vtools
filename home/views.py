@@ -14,7 +14,6 @@ import glob
 import io
 from PIL.Image import Image
 import PIL
-import cv2
 
 # Create your views here.
 def index(request):
