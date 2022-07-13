@@ -12,6 +12,9 @@ import instaloader
 import shutil
 import glob
 import io
+from PIL.Image import Image
+import PIL
+import cv2
 
 # Create your views here.
 def index(request):
@@ -36,7 +39,15 @@ def upload(request):
             print("success")
         else:
             print("kuchh or try karo bhai")
-        return FileResponse(open(pathh2, 'rb'), content_type='application/pdf')
+        data = io.BytesIO()
+        with open(pathh2,"rb") as fh:
+            data.write(fh.read())
+        data.seek(0)
+        response = HttpResponse(data,content_type='application/pdf')
+        response['Content-Disposition'] = "attachment; filename=%s" % finalname
+        os.remove(pathh)
+        os.remove(pathh2)
+        return response
     return render(request,'index.html')
 
 def download(request):
@@ -65,7 +76,7 @@ def instagram(request):
         ig = instaloader.Instaloader()
         dp = inp_value
         filee=dp+".jpg"
-        path ="instagram"
+        path = "instagram"
         ig.download_profile(dp ,path, profile_pic_only=True)
         files_path = os.path.join(path, '*')
         files = sorted(
@@ -73,8 +84,8 @@ def instagram(request):
         print(files[0])
         directory = dp
         parent = os.getcwd()
-        path = os.path.join(parent, directory)
-        shutil.rmtree(path, ignore_errors=False)
+        pathh = os.path.join(parent, directory)
+        shutil.rmtree(pathh, ignore_errors=True)
         data = io.BytesIO()
         with open(files[0],"rb") as fh:
             data.write(fh.read())
@@ -84,3 +95,24 @@ def instagram(request):
         os.remove(files[0])
         return response
     return render(request,'instadown.html')
+
+def imagecomp(request):
+  if request.method == 'POST':
+    file = request.FILES['document']
+    filename = file.name
+    img = PIL.Image.open(file)
+    myHeight,myWidth = img.size
+    split_tup = os.path.splitext(filename)
+    finalname = split_tup[0]
+    img = img.resize((myHeight,myWidth),PIL.Image.ANTIALIAS)
+    path = "compressor/"+finalname
+    img.save(path+"_compressed.jpg")
+    data = io.BytesIO()
+    with open(path+"_compressed.jpg","rb") as fh:
+        data.write(fh.read())
+    data.seek(0)
+    response = HttpResponse(data,content_type="application/jpg")
+    response['Content-Disposition'] = "attachment; filename=%s" % path+"_compressed.jpg"
+    os.remove(path+"_compressed.jpg")
+    return response
+  return render(request,'imagecomp.html')
