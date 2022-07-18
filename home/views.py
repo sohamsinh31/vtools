@@ -1,10 +1,12 @@
-from http.client import HTTPResponse
-import profile
-from django.http import HttpResponse, HttpResponseRedirect
+from datetime import datetime
+from multiprocessing import context
+from tkinter.messagebox import NO
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.shortcuts import render
 from docx2pdf import convert
-from django.http import FileResponse
 import os
+from os.path import exists
+from numpy import product
 from pytube import YouTube,streams,helpers
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
@@ -14,6 +16,8 @@ import glob
 import io
 from PIL.Image import Image
 import PIL
+from .models import Product
+from django.db.models import Q
 
 # Create your views here.
 def index(request):
@@ -52,12 +56,10 @@ def upload(request):
 def download(request):
     if request.method == 'POST':
         inp_value = request.POST['download']
-        print(inp_value)
         url = YouTube(inp_value)
         video = url.streams.get_highest_resolution()
         filename = video.default_filename
         path=settings.MEDIA2
-        print(settings.MEDIA2)
         video.download(output_path=settings.MEDIA2)
         data = io.BytesIO()
         with open(path+"/"+filename,"rb") as fh:
@@ -65,9 +67,12 @@ def download(request):
         data.seek(0)
         response = HttpResponse(data,content_type='application/mp4')
         response['Content-Disposition'] = "attachment; filename=%s" % filename
-        os.remove(path+"/"+filename)
+        file_exists = exists(path+"/"+filename)
+        if file_exists:
+         os.remove(path+"/"+filename)
         return response
     return render(request,'download.html')
+
 
 def instagram(request):
     if request.method == 'POST':
@@ -115,3 +120,43 @@ def imagecomp(request):
     os.remove(path+"_compressed.jpg")
     return response
   return render(request,'imagecomp.html')
+
+def dropbox(request):
+    a = []
+    if request.method=='POST':
+        file = request.FILES['download']
+        username = request.POST['username']
+        filename = file.name
+        split_tup = os.path.splitext(filename)
+        extension = split_tup[1]
+        folder = "dropbox/"
+        fs = FileSystemStorage(location=folder) #defaults to   MEDIA_ROOT  
+        filename2 = fs.save(file.name, file)
+        file_url = folder+filename2
+        b=datetime.now()
+        c = b.strftime("%m/%d/%Y %H:%M:%S")
+        print(file_url)
+        product = Product(
+            username=username,
+            fileurl=file_url,
+            filename=filename2,
+            date=c
+        )
+        product.save()
+        query = Product.objects.filter(Q(username=username))
+        a.append(query)
+    if len(a)==1:
+        context={'products':query}
+    else:
+        context={'products':"No files found"}
+    return render(request,'dropbox.html',context)
+
+def filedownload(request):
+    if request.method == 'GET':
+        path = request.GET.get('p',None)
+        print(path)
+        path2 = path.split("/")
+        print(path2[1])
+        response = HttpResponse(path,content_type="application/force-download")
+        response['Content-Disposition'] = "attachment; filename=%s" % path2[1]
+        return response
