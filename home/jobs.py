@@ -17,7 +17,8 @@ def job():
          sum = a.hour - d.hour
          if sum>=1:
             os.remove(product.fileurl)
-            query.delete()
+            query2 = Product.objects.filter(Q(fileurl=product.fileurl))
+            query2.delete()
         #  print(sum)
 
 
