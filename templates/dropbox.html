@@ -9,13 +9,22 @@
 </head>
 <body>
     <form class="box" method="post" enctype="multipart/form-data">
-        {% csrf_token %}        
+        {% csrf_token %}
+        {% for product in products %}
+        {% if product.username %}
+        <input type="hidden" placeholder="Enter temperery username" name="username" value={{product.username}}> 
+        {% else %}
         <input type="text" placeholder="Enter temperery username" name="username" required> 
-        <input type="file" name="download" required>
-        <button type="submit">Download</button>
+        {% endif %}
+        {% endfor %}
+        <input type="file" name="download">
+        <button type="submit">Drop</button>
     </form>
     <div class="container">
         {% for product in products %}
+        {% if product.username %}
+        <h2>Your temperery username is:{{product.username}} Enter this username to access your drop within 1 hour anywhere</h2>
+        {% endif %}
         <h1><a href="/drops/?p={{product.fileurl}}">{{product.filename}}</a></h1>
         {% endfor %}
     </div>

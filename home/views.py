@@ -124,31 +124,31 @@ def imagecomp(request):
 def dropbox(request):
     a = []
     if request.method=='POST':
-        file = request.FILES['download']
         username = request.POST['username']
-        filename = file.name
-        split_tup = os.path.splitext(filename)
-        extension = split_tup[1]
-        folder = "dropbox/"
-        fs = FileSystemStorage(location=folder) #defaults to   MEDIA_ROOT  
-        filename2 = fs.save(file.name, file)
-        file_url = folder+filename2
-        b=datetime.now()
-        c = b.strftime("%m/%d/%Y %H:%M:%S")
-        print(file_url)
-        product = Product(
-            username=username,
-            fileurl=file_url,
-            filename=filename2,
-            date=c
-        )
-        product.save()
+        if 'download' in request.FILES:
+            file = request.FILES['download']
+            filename = file.name
+            split_tup = os.path.splitext(filename)
+            extension = split_tup[1]
+            folder = "dropbox/"
+            fs = FileSystemStorage(location=folder) #defaults to   MEDIA_ROOT  
+            filename2 = fs.save(file.name, file)
+            file_url = folder+filename2
+            b=datetime.now()
+            c = b.strftime("%m/%d/%Y %H:%M:%S")
+            product = Product(
+                username=username,
+                fileurl=file_url,
+                filename=filename2,
+                date=c
+            )
+            product.save()
         query = Product.objects.filter(Q(username=username))
         a.append(query)
     if len(a)==1:
         context={'products':query}
     else:
-        context={'products':"No files found"}
+        context={'products':{'username':''}}
     return render(request,'dropbox.html',context)
 
 def filedownload(request):
