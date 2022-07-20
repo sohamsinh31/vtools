@@ -159,7 +159,6 @@ def dropbox(request):
                 date=c
             )
             product.save()
-        print(username)
         query = Product.objects.filter(Q(username=username))
         a.append(query)
     if len(a)==1:
