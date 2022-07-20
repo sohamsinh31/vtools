@@ -12,21 +12,28 @@
         {% csrf_token %}
         {% for product in products %}
         {% if product.username %}
-        <input type="hidden" placeholder="Enter temperery username" name="username" value={{product.username}}> 
+        <input type="hidden" placeholder="Enter temperery username" name="username2" value={{product.username}}> 
         {% else %}
-        <input type="text" placeholder="Enter temperery username" name="username" required> 
+        <h3>Enter your temporary username to access drop</h3>
+        <input type="text" placeholder="Enter temperery username" name="username"> 
         {% endif %}
         {% endfor %}
+    <br>
+    <h3>Or create new with dropping files</h3>
         <input type="file" name="download">
         <button type="submit">Drop</button>
     </form>
     <div class="container">
         {% for product in products %}
-        {% if product.username %}
+        {% if forloop.first %}
+         {% if product.username %}
         <h2>Your temperery username is:{{product.username}} Enter this username to access your drop within 1 hour anywhere</h2>
+         {% endif %}
         {% endif %}
-        <h1><a href="/drops/?p={{product.fileurl}}">{{product.filename}}</a></h1>
         {% endfor %}
+        {% for product in products %}
+        <h1><a href="/drops/?p={{product.fileurl}}">{{product.filename}}</a></h1>
+        {%endfor%}
     </div>
 </form>
 </body>

@@ -18,6 +18,8 @@ from PIL.Image import Image
 import PIL
 from .models import Product
 from django.db.models import Q
+import string
+import random
 
 # Create your views here.
 def index(request):
@@ -124,7 +126,21 @@ def imagecomp(request):
 def dropbox(request):
     a = []
     if request.method=='POST':
-        username = request.POST['username']
+        characters = list(string.ascii_letters + string.digits + "!@#$%^&*()")
+        def generate_random_password():
+            random.shuffle(characters)
+            password = []
+            for i in range(10):
+                password.append(random.choice(characters))
+            random.shuffle(password)
+            return "".join(password)
+        username = generate_random_password()
+        if 'username' in request.POST:
+            if request.POST['username'] != '':
+                username = request.POST['username']
+        if 'username2' in request.POST:
+            if request.POST['username2'] != '':
+                username = request.POST['username2']
         if 'download' in request.FILES:
             file = request.FILES['download']
             filename = file.name
@@ -143,6 +159,7 @@ def dropbox(request):
                 date=c
             )
             product.save()
+        print(username)
         query = Product.objects.filter(Q(username=username))
         a.append(query)
     if len(a)==1:
