@@ -169,10 +169,16 @@ def dropbox(request):
 
 def filedownload(request):
     if request.method == 'GET':
-        path = request.GET.get('p',None)
-        print(path)
-        path2 = path.split("/")
-        print(path2[1])
-        response = HttpResponse(path,content_type="application/force-download")
-        response['Content-Disposition'] = "attachment; filename=%s" % path2[1]
-        return response
+        try:
+            path = request.GET.get('p',None)
+            file_exists = exists(path)
+            if file_exists:
+                path2 = path.split("/")
+                response = HttpResponse(path,content_type="application/force-download")
+                response['Content-Disposition'] = "attachment; filename=%s" % path2[1]
+                return response
+            else:
+                return HttpResponse("<h3>file not found your time limit is over</h3>")
+
+        except:
+            return HttpResponse("<h3>file not found your time limit is over</h3>")

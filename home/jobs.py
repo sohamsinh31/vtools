@@ -1,6 +1,7 @@
 from calendar import month
 import threading
 import time
+from django.http import HttpResponse
 from schedule import Scheduler
 import schedule
 from .models import Product
@@ -14,12 +15,14 @@ def job():
         a = datetime.now()
         d = datetime.strptime(product.date,'%m/%d/%Y %H:%M:%S')
         if a.day==d.day and a.month==d.month:
-         sum = a.hour - d.hour
-         if sum>=1:
-            os.remove(product.fileurl)
-            query2 = Product.objects.filter(Q(fileurl=product.fileurl))
-            query2.delete()
-        #  print(sum)
+            sum = a.hour - d.hour
+            if sum>=1:
+                try:
+                    os.remove(product.fileurl)
+                    query2 = Product.objects.filter(Q(fileurl=product.fileurl))
+                    query2.delete()
+                except:
+                    return HttpResponse("<h3>file not found your time limit is over</h3>")
 
 
 def job2():
