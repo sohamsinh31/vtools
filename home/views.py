@@ -1,13 +1,11 @@
 from datetime import datetime
-from multiprocessing import context
-from tkinter.messagebox import NO
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.shortcuts import render
 from docx2pdf import convert
 import os
 from os.path import exists
 from numpy import product
-from pytube import YouTube,streams,helpers
+from pytube import YouTube,helpers,streams
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 import instaloader
@@ -53,7 +51,7 @@ def upload(request):
         os.remove(pathh)
         os.remove(pathh2)
         return response
-    return render(request,'index.html')
+    return render(request,'upload.html')
 
 def download(request):
     if request.method == 'POST':
@@ -67,7 +65,7 @@ def download(request):
         with open(path+"/"+filename,"rb") as fh:
             data.write(fh.read())
         data.seek(0)
-        response = HttpResponse(data,content_type='application/mp4')
+        response = HttpResponse(data,content_type='video/mp4')
         response['Content-Disposition'] = "attachment; filename=%s" % filename
         file_exists = exists(path+"/"+filename)
         if file_exists:
@@ -87,7 +85,7 @@ def instagram(request):
         files_path = os.path.join(path, '*')
         files = sorted(
            glob.iglob(files_path), key=os.path.getctime, reverse=True) 
-        print(files[0])
+        #print(files[0])
         directory = dp
         parent = os.getcwd()
         pathh = os.path.join(parent, directory)
@@ -96,7 +94,7 @@ def instagram(request):
         with open(files[0],"rb") as fh:
             data.write(fh.read())
         data.seek(0)
-        response = HttpResponse(data,content_type="application/jpg")
+        response = HttpResponse(data,content_type="image/jpg")
         response['Content-Disposition'] = "attachment; filename=%s" % filee
         os.remove(files[0])
         return response
@@ -168,13 +166,17 @@ def dropbox(request):
     return render(request,'dropbox.html',context)
 
 def filedownload(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
         try:
-            path = request.GET.get('p',None)
+            path = request.POST['fileurl']
             file_exists = exists(path)
             if file_exists:
                 path2 = path.split("/")
-                response = HttpResponse(path,content_type="application/force-download")
+                data = io.BytesIO()
+                with open(path,"rb") as fh:
+                    data.write(fh.read())
+                data.seek(0)
+                response = HttpResponse(data,content_type="image/jpg")
                 response['Content-Disposition'] = "attachment; filename=%s" % path2[1]
                 return response
             else:

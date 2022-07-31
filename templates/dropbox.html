@@ -27,12 +27,18 @@
         {% for product in products %}
         {% if forloop.first %}
          {% if product.username %}
-        <h2>Your temperery username is:{{product.username}} Enter this username to access your drop within 1 hour anywhere</h2>
+        <h2>Your temperery username is:{{product.username}}.</h2><h3>Enter this username to access your drop within 1 hour anywhere</h3>
          {% endif %}
         {% endif %}
         {% endfor %}
         {% for product in products %}
-        <h1><a href="/drops/?p={{product.fileurl}}">{{product.filename}}</a></h1>
+        <form action="../drops/" method="post" enctype="multipart/form-data">
+            {%csrf_token%}
+        <h1>
+            <input type="hidden" placeholder="Enter temperery username" name="fileurl" value={{product.fileurl}}> 
+            {% comment %} <a href="/drops/?p={{product.fileurl}}">{% endcomment %}
+                <button type="submit">{{product.filename}}</button></h1> 
+        </form>
         {%endfor%}
     </div>
 </form>
