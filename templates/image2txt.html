@@ -9,8 +9,9 @@
 <body>
 <form enctype="multipart/form-data" method="post">
     {% csrf_token %}
-    <input accept=".docx" type="file" name="document">
-    <button type="submit">Upload</button>
+    <input accept="image/*" type="file" name="image">
+    <button type="submit">convert</button>
 </form>
+<h2>{{text}}</h2>
 </body>
 </html>

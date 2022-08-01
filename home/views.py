@@ -18,6 +18,7 @@ from .models import Product
 from django.db.models import Q
 import string
 import random
+import pytesseract
 
 # Create your views here.
 def index(request):
@@ -184,3 +185,18 @@ def filedownload(request):
 
         except:
             return HttpResponse("<h3>file not found your time limit is over</h3>")
+def imagetxt(request):
+    import PIL.Image
+    a=[]
+    if request.method == 'POST':
+        if 'image' in request.FILES:
+            image = request.FILES['image']
+            pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+            text = pytesseract.image_to_string(PIL.Image.open(image), lang="eng")
+            a.append(text)
+            print(text)
+    if len(a)>0:
+        context={'text':a[0]}
+    else:
+        context={'text':"none"}
+    return render(request,'image2txt.html',context)
