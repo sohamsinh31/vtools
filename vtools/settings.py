@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 from pathlib import Path
+#from gtts.tts import gTTS
+from pyttsx3 import speak
+
 
 SETTINGS_PATH = os.path.dirname(os.path.dirname(__file__))
 
@@ -35,6 +38,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'vtools',
+    #'gtts',
     'home.apps.HomeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -72,6 +76,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries':{
+                'myload':'vtools.templatetags.myload',
+            }
         },
     },
 ]

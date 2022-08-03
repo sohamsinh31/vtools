@@ -19,6 +19,8 @@ from django.db.models import Q
 import string
 import random
 import pytesseract
+from gtts.tts import gTTS
+import pyttsx3
 
 # Create your views here.
 def index(request):
@@ -193,10 +195,12 @@ def imagetxt(request):
             image = request.FILES['image']
             pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
             text = pytesseract.image_to_string(PIL.Image.open(image), lang="eng")
+            language = 'en'
+            myobj = gTTS(text=text, lang=language, slow=False)
+            data = io.BytesIO()
             a.append(text)
-            print(text)
     if len(a)>0:
-        context={'text':a[0]}
+        context={'text':a[0],'audio':a[0]}
     else:
         context={'text':"none"}
     return render(request,'image2txt.html',context)
