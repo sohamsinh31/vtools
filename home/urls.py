@@ -13,5 +13,7 @@ urlpatterns = [
     path("download/imagecomp/",views.imagecomp,name='Imagecomp'),
     path("dropbox/",views.dropbox,name='Dropbox'),
     path("image/text/",views.imagetxt,name='Image2text'),
+    path("image/edit/",views.imageEdit,name='imageedit'),
+    path("api/",views.phpapi,name='api'),
     path('drops/',views.filedownload,name='filedownload')
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
